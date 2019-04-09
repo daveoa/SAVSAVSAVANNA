@@ -1,9 +1,13 @@
-﻿namespace Savanna
+﻿using Savanna.Engine;
+
+namespace Savanna
 {
-    class Program
+    public class Program
     {
         static void Main(string[] args)
         {
+            GameEngine game = new GameEngine();
+            game.Start();
         }
     }
 }

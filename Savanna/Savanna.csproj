@@ -43,11 +43,38 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Engine\AnimalFactory\SavannaFactory.cs" />
+    <Compile Include="Engine\AnimalFactory\Templates\BiomeFactory.cs" />
+    <Compile Include="Engine\Config\FieldDimensions.cs" />
+    <Compile Include="Engine\Config\Settings.cs" />
+    <Compile Include="Engine\FieldDisplayer\ConsoleFieldDisplayer.cs" />
+    <Compile Include="Engine\FieldDisplayer\Converters\FieldToString.cs" />
+    <Compile Include="Engine\FieldDisplayer\Templates\IFieldDisplayer.cs" />
+    <Compile Include="Engine\GameEngine.cs" />
+    <Compile Include="Engine\GameMechanics\Animals\AnimalTemplates\Carnivore.cs" />
+    <Compile Include="Engine\GameMechanics\Animals\AnimalTemplates\Herbivore.cs" />
+    <Compile Include="Engine\GameMechanics\Animals\AnimalTemplates\IAnimal.cs" />
+    <Compile Include="Engine\GameMechanics\Animals\AnimalTemplates\IFieldPresentable.cs" />
+    <Compile Include="Engine\GameMechanics\Animals\Antilope.cs" />
+    <Compile Include="Engine\GameMechanics\Animals\Lion.cs" />
+    <Compile Include="Engine\GameMechanics\Field.cs" />
+    <Compile Include="Engine\GameMechanics\GenericMovement.cs" />
+    <Compile Include="Engine\GameMechanics\Models\Coordinates.cs" />
+    <Compile Include="Engine\GameMechanics\Spawner.cs" />
+    <Compile Include="Engine\GameMechanics\Templates\ICoordinates.cs" />
+    <Compile Include="Engine\GameMechanics\Templates\IField.cs" />
+    <Compile Include="Engine\GameMechanics\Templates\ISpawner.cs" />
+    <Compile Include="Engine\GameMechanics\Validators\CoordinateValidator.cs" />
+    <Compile Include="Engine\UserInteraction\ConsoleInputAnimalType.cs" />
+    <Compile Include="Engine\UserInteraction\KeyTriggers\EscapeKeyPress.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Engine\UserInteraction\Templates\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
