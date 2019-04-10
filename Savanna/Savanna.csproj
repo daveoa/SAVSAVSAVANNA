@@ -61,7 +61,6 @@
     <Compile Include="Engine\GameMechanics\GenericMovement.cs" />
     <Compile Include="Engine\GameMechanics\Models\Coordinates.cs" />
     <Compile Include="Engine\GameMechanics\Spawner.cs" />
-    <Compile Include="Engine\GameMechanics\Templates\ICoordinates.cs" />
     <Compile Include="Engine\GameMechanics\Templates\IField.cs" />
     <Compile Include="Engine\GameMechanics\Templates\ISpawner.cs" />
     <Compile Include="Engine\GameMechanics\Validators\CoordinateValidator.cs" />

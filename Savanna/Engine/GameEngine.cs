@@ -3,6 +3,7 @@ using Savanna.Engine.Config;
 using Savanna.Engine.FieldDisplayer;
 using Savanna.Engine.GameMechanics;
 using Savanna.Engine.UserInteraction;
+using System;
 using System.Threading;
 
 namespace Savanna.Engine
@@ -12,6 +13,7 @@ namespace Savanna.Engine
         private SavannaFactory _factory;
         private Field _field;
         private ConsoleFieldDisplayer _displayer;
+        private bool _isGameOver = false;
 
         public GameEngine()
         {
@@ -22,51 +24,43 @@ namespace Savanna.Engine
 
         public void Start()
         {
-            this.UserAddAnimals();
-            this.EnableMovement();
+            do
+            {
+                this.UserAddAnimals();
+                this.EnableMovement();
+            } while (!_isGameOver);
         }
 
         private void EnableMovement()
         {
-            while (_factory.Prey.Count != 0)
+            foreach (var hunter in _factory.Hunters)
             {
-                foreach (var hunter in _factory.Hunters)
-                {
-                    hunter.Hunt(_field);
-                }
-                _displayer.DisplayField(_field);
-                Thread.Sleep(Settings.Delay);
-                foreach (var hunted in _factory.Prey)
-                {
-                    hunted.Move(_field);
-                }
-                _displayer.DisplayField(_field);
-                Thread.Sleep(Settings.Delay);
+                hunter.Hunt(_field);
             }
+            _displayer.DisplayField(_field);
+            Thread.Sleep(Settings.Delay);
+            _factory.Prey.RemoveAll(item => _field.Contents[item.CoordinateX, item.CoordinateY] != item.Body);
+            foreach (var hunted in _factory.Prey)
+            {
+                hunted.Move(_field);
+            }
+            _displayer.DisplayField(_field);
+            Thread.Sleep(Settings.Delay);
         }
 
         private void UserAddAnimals()
         {
             ConsoleInputAnimalType.ShowNotification();
-
-            bool IsEPressed = false;
-            while (!IsEPressed)
+            var key = ConsoleInputAnimalType.GetInputChar();
+            if (key == Char.ToLower(Settings.AntilopeBody))
             {
-                var key = ConsoleInputAnimalType.GetInputChar();
-                if (key == Settings.AntilopeBody)
-                {
-                    _factory.CreateHerbivore(_field);
-                }
-                else if (key == Settings.LionBody)
-                {
-                    _factory.CreateCarnivore(_field);
-                }
-                else if (key == Settings.ExitKey)
-                {
-                    IsEPressed = true;
-                }
-                _displayer.DisplayField(_field);
+                _factory.CreateHerbivore(_field);
             }
+            else if (key == Char.ToLower(Settings.LionBody))
+            {
+                _factory.CreateCarnivore(_field);
+            }
+            _displayer.DisplayField(_field);
         }
     }
 }

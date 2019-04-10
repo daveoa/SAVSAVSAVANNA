@@ -12,7 +12,7 @@ namespace Savanna.Engine.GameMechanics
         private Random _rand = new Random();
         private CoordinateValidator _validator = new CoordinateValidator();
 
-        public ICoordinates Move(IField field, IFieldPresentable presentableObj, int fieldOfView)
+        public Coordinates Move(IField field, IFieldPresentable presentableObj, int fieldOfView)
         {
             var newCoords = GenerateNextMoveCoordinates(field, presentableObj, fieldOfView);
             field.Contents[presentableObj.CoordinateX, presentableObj.CoordinateY] = Settings.EmptyBlock;
@@ -20,7 +20,7 @@ namespace Savanna.Engine.GameMechanics
             return newCoords;
         }
 
-        private ICoordinates GenerateNextMoveCoordinates(IField field, IFieldPresentable presentableObj, int fieldOfView)
+        private Coordinates GenerateNextMoveCoordinates(IField field, IFieldPresentable presentableObj, int fieldOfView)
         {
             int moveToX;
             int moveToY;

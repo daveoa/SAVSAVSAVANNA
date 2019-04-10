@@ -1,4 +1,5 @@
-﻿using Savanna.Engine.GameMechanics.Templates;
+﻿using Savanna.Engine.GameMechanics.Models;
+using Savanna.Engine.GameMechanics.Templates;
 
 namespace Savanna.Engine.GameMechanics.Animals.AnimalTemplates
 {
@@ -13,6 +14,6 @@ namespace Savanna.Engine.GameMechanics.Animals.AnimalTemplates
 
         public abstract void Hunt(IField field);
 
-        public abstract void Eat(IField field, ICoordinates preyLocation);
+        public abstract void Eat(IField field, Coordinates preyLocation);
     }
 }

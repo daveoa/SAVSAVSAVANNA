@@ -1,8 +1,6 @@
-﻿using Savanna.Engine.GameMechanics.Templates;
-
-namespace Savanna.Engine.GameMechanics.Models
+﻿namespace Savanna.Engine.GameMechanics.Models
 {
-    public class Coordinates : ICoordinates
+    public class Coordinates
     {
         public int CoordinateX { get; set; }
         public int CoordinateY { get; set; }

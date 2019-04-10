@@ -14,7 +14,7 @@ namespace Savanna.Engine.GameMechanics.Animals
         private GenericMovement _generic = new GenericMovement();
         private CoordinateValidator _validator = new CoordinateValidator();
 
-        public override void Eat(IField field, ICoordinates preyLocation)
+        public override void Eat(IField field, Coordinates preyLocation)
         {
             field.Contents[preyLocation.CoordinateX, preyLocation.CoordinateY] = this.Body;
             field.Contents[this.CoordinateX, this.CoordinateY] = Settings.EmptyBlock;
@@ -40,7 +40,7 @@ namespace Savanna.Engine.GameMechanics.Animals
             this.CoordinateY = newCoords.CoordinateY;
         }
 
-        private ICoordinates findPreyLocation(IField field)
+        private Coordinates findPreyLocation(IField field)
         {
             for (int yAxis = this.CoordinateY - this.FieldOfView; yAxis <= this.CoordinateY + this.FieldOfView; yAxis++)
             {

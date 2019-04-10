@@ -13,7 +13,7 @@ namespace Savanna.Engine.FieldDisplayer
         public void DisplayField(IField field)
         {
             _displayStr = _converter.Transform(field);
-            Console.SetCursorPosition(0, 1);
+            Console.SetCursorPosition(0, 0);
             Console.Write(_displayStr);
         }
     }

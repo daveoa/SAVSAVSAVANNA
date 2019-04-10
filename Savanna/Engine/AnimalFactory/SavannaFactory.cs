@@ -9,14 +9,14 @@ namespace Savanna.Engine.AnimalFactory
 {
     public class SavannaFactory : IBiomeFactory
     {
-        public List<Antilope> Prey;
-        public List<Lion> Hunters;
+        public List<Herbivore> Prey;
+        public List<Carnivore> Hunters;
         private Spawner _spawn = new Spawner();
 
         public SavannaFactory()
         {
-            Prey = new List<Antilope>();
-            Hunters = new List<Lion>();
+            Prey = new List<Herbivore>();
+            Hunters = new List<Carnivore>();
             _spawn = new Spawner();
         }
 
