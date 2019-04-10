@@ -12,15 +12,15 @@ namespace Savanna.Engine.GameMechanics
         private Random _rand = new Random();
         private CoordinateValidator _validator = new CoordinateValidator();
 
-        public Coordinates Move(IField field, IFieldPresentable presentableObj, int fieldOfView)
+        public Coordinates Move(IField field, IFieldPresentable presentableObj, int stepsize)
         {
-            var newCoords = GenerateNextMoveCoordinates(field, presentableObj, fieldOfView);
+            var newCoords = GenerateNextMoveCoordinates(field, presentableObj, stepsize);
             field.Contents[presentableObj.CoordinateX, presentableObj.CoordinateY] = Settings.EmptyBlock;
             field.Contents[newCoords.CoordinateX, newCoords.CoordinateY] = presentableObj.Body;
             return newCoords;
         }
 
-        private Coordinates GenerateNextMoveCoordinates(IField field, IFieldPresentable presentableObj, int fieldOfView)
+        private Coordinates GenerateNextMoveCoordinates(IField field, IFieldPresentable presentableObj, int stepsize)
         {
             int moveToX;
             int moveToY;
@@ -28,8 +28,8 @@ namespace Savanna.Engine.GameMechanics
             {
                 do
                 {
-                    var offsetX = _rand.Next(-4, fieldOfView);
-                    var offsetY = _rand.Next(-4, fieldOfView);
+                    var offsetX = _rand.Next(-stepsize, ++stepsize);
+                    var offsetY = _rand.Next(-stepsize, ++stepsize);
                     moveToX = presentableObj.CoordinateX + offsetX;
                     moveToY = presentableObj.CoordinateY + offsetY;
                 } while (!_validator.CoordinatesAreValid(moveToX, moveToY));

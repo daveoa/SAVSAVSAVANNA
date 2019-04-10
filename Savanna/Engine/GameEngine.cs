@@ -42,7 +42,7 @@ namespace Savanna.Engine
             _factory.Prey.RemoveAll(item => _field.Contents[item.CoordinateX, item.CoordinateY] != item.Body);
             foreach (var hunted in _factory.Prey)
             {
-                hunted.Move(_field);
+                hunted.Evade(_field);
             }
             _displayer.DisplayField(_field);
             Thread.Sleep(Settings.Delay);
@@ -51,14 +51,16 @@ namespace Savanna.Engine
         private void UserAddAnimals()
         {
             ConsoleInputAnimalType.ShowNotification();
-            var key = ConsoleInputAnimalType.GetInputChar();
-            if (key == Char.ToLower(Settings.AntilopeBody))
+            while (Console.KeyAvailable)
             {
-                _factory.CreateHerbivore(_field);
-            }
-            else if (key == Char.ToLower(Settings.LionBody))
-            {
-                _factory.CreateCarnivore(_field);
+                if (Console.ReadKey(true).KeyChar == Char.ToLower(Settings.AntilopeBody))
+                {
+                    _factory.CreateHerbivore(_field);
+                }
+                if (Console.ReadKey(true).KeyChar == Char.ToLower(Settings.LionBody))
+                {
+                    _factory.CreateCarnivore(_field);
+                }
             }
             _displayer.DisplayField(_field);
         }
