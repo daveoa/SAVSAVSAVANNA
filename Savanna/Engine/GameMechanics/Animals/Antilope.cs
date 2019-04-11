@@ -3,6 +3,7 @@ using Savanna.Engine.GameMechanics.Animals.AnimalTemplates;
 using Savanna.Engine.GameMechanics.Models;
 using Savanna.Engine.GameMechanics.Templates;
 using Savanna.Engine.GameMechanics.Validators;
+using System;
 using System.Collections.Generic;
 
 namespace Savanna.Engine.GameMechanics.Animals
@@ -24,7 +25,17 @@ namespace Savanna.Engine.GameMechanics.Animals
 
         public override void Evade(IField field)
         {
+            var predatorLocations = GetAllNearbyPredators(field);
+            if (predatorLocations != null)
+            {
+                var newPos = MoveAway(field, predatorLocations);
+                CoordinateX = newPos.CoordinateX;
+                CoordinateY = newPos.CoordinateY;
+            }
+            else
+            {
                 Move(field);
+            }
         }
 
         public override void Move(IField field)
@@ -50,7 +61,7 @@ namespace Savanna.Engine.GameMechanics.Animals
                     {
                         continue;
                     }
-                    if (field.Contents[xAxis, yAxis] == Settings.AntilopeBody)
+                    if (field.Contents[xAxis, yAxis] == Settings.LionBody)
                     {
                         predatorsCoords.Add(new Coordinates(xAxis, yAxis));
                     }
@@ -66,8 +77,67 @@ namespace Savanna.Engine.GameMechanics.Animals
 
         private Coordinates MoveAway(IField field, List<Coordinates> predatorsCoords)
         {
-            // maybe think of something using weighted graphs, MAYBE
-            return null;
+            var predatorAvg = GetAvgPredatorLocation(predatorsCoords);
+            Coordinates newPos = DetermineMoveAway(predatorAvg);
+            field.Contents[CoordinateX, CoordinateY] = Settings.EmptyBlock;
+            field.Contents[newPos.CoordinateX, newPos.CoordinateY] = Body;
+
+            return newPos;
+        }
+
+        private Coordinates GetAvgPredatorLocation(List<Coordinates> predatorsCoords)
+        {
+            double avgXPos = 0, avgYPos = 0;
+
+            foreach (var pair in predatorsCoords)
+            {
+                avgXPos += pair.CoordinateX;
+                avgYPos += pair.CoordinateY;
+            }
+            avgXPos = Math.Round(avgXPos / predatorsCoords.Count);
+            avgYPos = Math.Round(avgYPos / predatorsCoords.Count);
+            
+            return new Coordinates((int)avgXPos, (int)avgYPos);
+        }
+
+        private Coordinates DetermineMoveAway(Coordinates avgPredatorPos)
+        {
+            int newXPos = CalculateMoveAwayAxisPoint(avgPredatorPos.CoordinateX, CoordinateX);
+            int newYPos = CalculateMoveAwayAxisPoint(avgPredatorPos.CoordinateY, CoordinateY);
+
+            newXPos = AllignIfOutOfBounds(newXPos, FieldDimensions.Width);
+            newYPos = AllignIfOutOfBounds(newYPos, FieldDimensions.Height);
+
+            return new Coordinates(newXPos, newYPos);
+        }
+
+        private int AllignIfOutOfBounds(int axisPoint, int maxPoint)
+        {
+            if (axisPoint < 0)
+            {
+                return 0;
+            }
+            if (axisPoint >= maxPoint)
+            {
+                axisPoint = maxPoint - 1;
+                return axisPoint;
+            }
+            return axisPoint;
+        }
+
+        private int CalculateMoveAwayAxisPoint(int avgPredatorAxisPoint, int preyAxisPoint)
+        {
+            int newAxisPoint = preyAxisPoint;
+
+            if (avgPredatorAxisPoint > preyAxisPoint)
+            {
+                newAxisPoint -= StepSize;
+            }
+            if (avgPredatorAxisPoint < preyAxisPoint)
+            {
+                newAxisPoint += StepSize;
+            }
+            return newAxisPoint;
         }
     }
 }

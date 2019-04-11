@@ -28,8 +28,7 @@ namespace Savanna.Engine.GameMechanics
 
         private Coordinates GenerateNextMoveCoordinates(IField field, IFieldPresentable presentableObj, int stepSize)
         {
-            int moveToX;
-            int moveToY;
+            int moveToX, moveToY;
             int minRand = -stepSize;
             int maxRand = stepSize + 1;
 
