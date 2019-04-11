@@ -2,8 +2,8 @@
 using Savanna.Engine.Config;
 using Savanna.Engine.FieldDisplayer;
 using Savanna.Engine.GameMechanics;
+using Savanna.Engine.GameMechanics.Templates;
 using Savanna.Engine.UserInteraction;
-using System;
 using System.Threading;
 
 namespace Savanna.Engine
@@ -11,8 +11,9 @@ namespace Savanna.Engine
     public class GameEngine
     {
         private SavannaFactory _factory;
-        private Field _field;
+        private IField _field;
         private ConsoleFieldDisplayer _displayer;
+        private ConsoleUserAddAnimals _user;
         private bool _isGameOver = false;
 
         public GameEngine()
@@ -20,14 +21,15 @@ namespace Savanna.Engine
             _factory = new SavannaFactory();
             _field = new Field();
             _displayer = new ConsoleFieldDisplayer();
+            _user = new ConsoleUserAddAnimals(_factory, _field);
         }
 
         public void Start()
         {
             do
             {
-                this.UserAddAnimals();
-                this.EnableMovement();
+                UserAddAnimals();
+                EnableMovement();
             } while (!_isGameOver);
         }
 
@@ -50,18 +52,7 @@ namespace Savanna.Engine
 
         private void UserAddAnimals()
         {
-            ConsoleInputAnimalType.ShowNotification();
-            while (Console.KeyAvailable)
-            {
-                if (Console.ReadKey(true).KeyChar == Char.ToLower(Settings.AntilopeBody))
-                {
-                    _factory.CreateHerbivore(_field);
-                }
-                if (Console.ReadKey(true).KeyChar == Char.ToLower(Settings.LionBody))
-                {
-                    _factory.CreateCarnivore(_field);
-                }
-            }
+            _user.AddAnimals();
             _displayer.DisplayField(_field);
         }
     }

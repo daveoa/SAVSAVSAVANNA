@@ -13,6 +13,7 @@
         public static int AntilopeSight => 3;
         public static int LionStep => 2;
         public static int AntilopeStep => 3;
-        public static int Delay => 500;
+
+        public const int Delay = 500;
     }
 }

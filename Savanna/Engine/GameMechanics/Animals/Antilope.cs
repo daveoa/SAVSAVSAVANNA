@@ -13,33 +13,38 @@ namespace Savanna.Engine.GameMechanics.Animals
         public override int StepSize { get => Settings.AntilopeStep; }
         public override char Body { get => Settings.AntilopeBody; }
 
-        private GenericMovement _generic = new GenericMovement();
-        private CoordinateValidator _validator = new CoordinateValidator();
-        private List<Coordinates> _predatorsInSight;
+        private Movement _stdMove;
+        private CoordinateValidator _validator;
+
+        public Antilope(Movement moves, CoordinateValidator validator)
+        {
+            _stdMove = moves;
+            _validator = validator;
+        }
 
         public override void Evade(IField field)
         {
-                this.Move(field);
+                Move(field);
         }
 
         public override void Move(IField field)
         {
-            var newCoords = _generic.Move(field, this, this.StepSize);
-            this.CoordinateX = newCoords.CoordinateX;
-            this.CoordinateY = newCoords.CoordinateY;
+            var newCoords = _stdMove.Move(field, this, StepSize);
+            CoordinateX = newCoords.CoordinateX;
+            CoordinateY = newCoords.CoordinateY;
         }
 
         private List<Coordinates> GetAllNearbyPredators(IField field)
         {
             var predatorsCoords = new List<Coordinates>();
 
-            for (int yAxis = this.CoordinateY - this.FieldOfView; yAxis <= this.CoordinateY + this.FieldOfView; yAxis++)
+            for (int yAxis = CoordinateY - FieldOfView; yAxis <= CoordinateY + FieldOfView; yAxis++)
             {
                 if (!_validator.CoordinateYIsValid(yAxis))
                 {
                     continue;
                 }
-                for (int xAxis = this.CoordinateX - this.FieldOfView; xAxis <= this.CoordinateX + this.FieldOfView; xAxis++)
+                for (int xAxis = CoordinateX - FieldOfView; xAxis <= CoordinateX + FieldOfView; xAxis++)
                 {
                     if (!_validator.CoordinateXIsValid(xAxis))
                     {

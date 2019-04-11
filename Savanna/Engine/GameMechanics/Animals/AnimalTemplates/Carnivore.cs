@@ -15,6 +15,6 @@ namespace Savanna.Engine.GameMechanics.Animals.AnimalTemplates
 
         public abstract void Hunt(IField field);
 
-        public abstract void Eat(IField field, Coordinates preyLocation);
+        protected abstract void Eat(IField field, Coordinates preyLocation);
     }
 }

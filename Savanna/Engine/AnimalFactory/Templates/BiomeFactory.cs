@@ -4,8 +4,6 @@ namespace Savanna.Engine.AnimalFactory.Templates
 {
     public interface IBiomeFactory
     {
-        void CreateHerbivore(IField field);
-
-        void CreateCarnivore(IField field);
+        void CreateAnimal(IField field, char animalBody);
     }
 }

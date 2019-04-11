@@ -7,10 +7,16 @@ using System;
 
 namespace Savanna.Engine.GameMechanics
 {
-    public class GenericMovement
+    public class Movement
     {
-        private Random _rand = new Random();
-        private CoordinateValidator _validator = new CoordinateValidator();
+        private Random _rand;
+        private CoordinateValidator _validator;
+
+        public Movement(Random rand, CoordinateValidator validator)
+        {
+            _rand = rand;
+            _validator = validator;
+        }
 
         public Coordinates Move(IField field, IFieldPresentable presentableObj, int stepsize)
         {
@@ -20,16 +26,19 @@ namespace Savanna.Engine.GameMechanics
             return newCoords;
         }
 
-        private Coordinates GenerateNextMoveCoordinates(IField field, IFieldPresentable presentableObj, int stepsize)
+        private Coordinates GenerateNextMoveCoordinates(IField field, IFieldPresentable presentableObj, int stepSize)
         {
             int moveToX;
             int moveToY;
+            int minRand = -stepSize;
+            int maxRand = stepSize + 1;
+
             do
             {
                 do
                 {
-                    var offsetX = _rand.Next(-stepsize, ++stepsize);
-                    var offsetY = _rand.Next(-stepsize, ++stepsize);
+                    var offsetX = _rand.Next(minRand, maxRand);
+                    var offsetY = _rand.Next(minRand, maxRand);
                     moveToX = presentableObj.CoordinateX + offsetX;
                     moveToY = presentableObj.CoordinateY + offsetY;
                 } while (!_validator.CoordinatesAreValid(moveToX, moveToY));
