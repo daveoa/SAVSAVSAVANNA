@@ -1,26 +1,41 @@
 ﻿using Savanna.Engine.AnimalFactory;
+using Savanna.Engine.AnimalFactory.Templates;
 using Savanna.Engine.Config;
 using Savanna.Engine.FieldDisplayer;
+using Savanna.Engine.FieldDisplayer.Converters;
+using Savanna.Engine.FieldDisplayer.Templates;
 using Savanna.Engine.GameMechanics;
 using Savanna.Engine.GameMechanics.Templates;
+using Savanna.Engine.GameMechanics.Validators;
 using Savanna.Engine.UserInteraction;
+using System;
 using System.Threading;
 
 namespace Savanna.Engine
 {
     public class GameEngine
     {
-        private SavannaFactory _factory;
+        private ISavannaFactory _factory;
         private IField _field;
+        private IFieldToString _fieldToStrConverter;
         private ConsoleFieldDisplayer _displayer;
         private ConsoleUserAddAnimals _user;
+        private Random _rand;
+        private ISpawner _spawn;
+        private Movement _standardMovement;
+        private CoordinateValidator _validator;
         private bool _isGameOver = false;
 
         public GameEngine()
         {
-            _factory = new SavannaFactory();
+            _rand = new Random();
+            _spawn = new Spawner(_rand);
+            _validator = new CoordinateValidator();
+            _standardMovement = new Movement(_rand, _validator);
+            _factory = new SavannaFactory(_validator, _spawn, _standardMovement);
             _field = new Field();
-            _displayer = new ConsoleFieldDisplayer();
+            _fieldToStrConverter = new FieldToString();
+            _displayer = new ConsoleFieldDisplayer(_fieldToStrConverter);
             _user = new ConsoleUserAddAnimals(_factory, _field);
         }
 

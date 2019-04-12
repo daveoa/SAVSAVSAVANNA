@@ -1,5 +1,4 @@
-﻿using Savanna.Engine.FieldDisplayer.Converters;
-using Savanna.Engine.FieldDisplayer.Templates;
+﻿using Savanna.Engine.FieldDisplayer.Templates;
 using Savanna.Engine.GameMechanics.Templates;
 using System;
 
@@ -7,8 +6,13 @@ namespace Savanna.Engine.FieldDisplayer
 {
     public class ConsoleFieldDisplayer : IFieldDisplayer
     {
-        private FieldToString _converter = new FieldToString();
+        private IFieldToString _converter;
         private string _displayStr;
+
+        public ConsoleFieldDisplayer(IFieldToString fieldToStringConverter)
+        {
+            _converter = fieldToStringConverter;
+        }
 
         public void DisplayField(IField field)
         {

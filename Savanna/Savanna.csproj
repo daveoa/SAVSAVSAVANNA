@@ -44,12 +44,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Engine\AnimalFactory\SavannaFactory.cs" />
-    <Compile Include="Engine\AnimalFactory\Templates\BiomeFactory.cs" />
+    <Compile Include="Engine\AnimalFactory\Templates\ISavannaFactory.cs" />
     <Compile Include="Engine\Config\FieldDimensions.cs" />
     <Compile Include="Engine\Config\Settings.cs" />
     <Compile Include="Engine\FieldDisplayer\ConsoleFieldDisplayer.cs" />
     <Compile Include="Engine\FieldDisplayer\Converters\FieldToString.cs" />
     <Compile Include="Engine\FieldDisplayer\Templates\IFieldDisplayer.cs" />
+    <Compile Include="Engine\FieldDisplayer\Templates\IFieldToString.cs" />
     <Compile Include="Engine\GameEngine.cs" />
     <Compile Include="Engine\GameMechanics\Animals\AnimalTemplates\Carnivore.cs" />
     <Compile Include="Engine\GameMechanics\Animals\AnimalTemplates\Herbivore.cs" />

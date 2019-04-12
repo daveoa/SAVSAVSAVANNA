@@ -10,23 +10,21 @@ using System.Collections.Generic;
 
 namespace Savanna.Engine.AnimalFactory
 {
-    public class SavannaFactory : IBiomeFactory
+    public class SavannaFactory : ISavannaFactory
     {
-        public List<Herbivore> Prey;
-        public List<Carnivore> Hunters;
+        public List<IHerbivore> Prey { get; set; }
+        public List<ICarnivore> Hunters { get; set; }
         private ISpawner _spawn;
         private Movement _standardMovement;
         private CoordinateValidator _validator;
-        private Random _rand;
 
-        public SavannaFactory()
+        public SavannaFactory(CoordinateValidator validator, ISpawner spawn, Movement movement)
         {
-            Prey = new List<Herbivore>();
-            Hunters = new List<Carnivore>();
-            _validator = new CoordinateValidator();
-            _rand = new Random();
-            _spawn = new Spawner(_rand);
-            _standardMovement = new Movement(_rand, _validator);
+            Prey = new List<IHerbivore>();
+            Hunters = new List<ICarnivore>();
+            _validator = validator;
+            _spawn = spawn;
+            _standardMovement = movement;
         }
 
         public void CreateAnimal(IField field, char animalBody)

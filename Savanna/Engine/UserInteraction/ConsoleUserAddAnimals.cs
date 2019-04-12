@@ -7,10 +7,10 @@ namespace Savanna.Engine.UserInteraction
 {
     public class ConsoleUserAddAnimals
     {
-        private IBiomeFactory _factory;
+        private ISavannaFactory _factory;
         private IField _field;
 
-        public ConsoleUserAddAnimals(IBiomeFactory factory, IField field)
+        public ConsoleUserAddAnimals(ISavannaFactory factory, IField field)
         {
             _factory = factory;
             _field = field;

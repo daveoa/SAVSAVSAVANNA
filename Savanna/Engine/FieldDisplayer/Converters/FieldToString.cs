@@ -1,10 +1,11 @@
 ﻿using Savanna.Engine.Config;
+using Savanna.Engine.FieldDisplayer.Templates;
 using Savanna.Engine.GameMechanics.Templates;
 using System.Text;
 
 namespace Savanna.Engine.FieldDisplayer.Converters
 {
-    public class FieldToString
+    public class FieldToString : IFieldToString
     {
         public string Transform(IField field)
         {
@@ -13,7 +14,7 @@ namespace Savanna.Engine.FieldDisplayer.Converters
             {
                 for (int w = 0; w < FieldDimensions.Width; w++)
                 {
-                    builder.Append(field.Contents[w, h]);
+                    builder.Append(field.Contents[w, h] + " ");
                 }
                 builder.Append('\n');
             }

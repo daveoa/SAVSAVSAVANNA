@@ -2,17 +2,17 @@
 {
     public static class Settings
     {
-        public static string AddAnimalNotification => 
+        public static string AddAnimalNotification = 
             $"{AntilopeBody} - Herbivore, {LionBody} - Carnivore";
 
-        public static char LionBody => 'L';
-        public static char AntilopeBody => 'A';
-        public static char EmptyBlock => '-';
+        public const char LionBody = 'L';
+        public const char AntilopeBody = 'A';
+        public const char EmptyBlock = '-';
 
-        public static int LionSight => 6;
-        public static int AntilopeSight => 5;
-        public static int LionStep => 2;
-        public static int AntilopeStep => 3;
+        public const int LionSight = 6;
+        public const int AntilopeSight = 5;
+        public const int LionStep = 2;
+        public const int AntilopeStep = 3;
 
         public const int Delay = 500;
     }

@@ -3,18 +3,10 @@ using Savanna.Engine.GameMechanics.Templates;
 
 namespace Savanna.Engine.GameMechanics.Animals.AnimalTemplates
 {
-    public abstract class Carnivore: IAnimal, IFieldPresentable
+    public interface ICarnivore: IAnimal, IFieldPresentable
     {
-        public abstract int FieldOfView { get; }
-        public abstract int StepSize { get; }
-        public abstract char Body { get; }
-        public int CoordinateX { get; set; }
-        public int CoordinateY { get; set; }
+        void Hunt(IField field);
 
-        public abstract void Move(IField field);
-
-        public abstract void Hunt(IField field);
-
-        protected abstract void Eat(IField field, Coordinates preyLocation);
+        void Eat(IField field, Coordinates preyLocation);
     }
 }

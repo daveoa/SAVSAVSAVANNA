@@ -8,11 +8,13 @@ using System.Collections.Generic;
 
 namespace Savanna.Engine.GameMechanics.Animals
 {
-    public class Antilope : Herbivore
+    public class Antilope : IHerbivore
     {
-        public override int FieldOfView { get => Settings.AntilopeSight; }
-        public override int StepSize { get => Settings.AntilopeStep; }
-        public override char Body { get => Settings.AntilopeBody; }
+        public int FieldOfView { get => Settings.AntilopeSight; }
+        public int StepSize { get => Settings.AntilopeStep; }
+        public char Body { get => Settings.AntilopeBody; }
+        public int CoordinateX { get; set; }
+        public int CoordinateY { get; set; }
 
         private Movement _stdMove;
         private CoordinateValidator _validator;
@@ -23,7 +25,7 @@ namespace Savanna.Engine.GameMechanics.Animals
             _validator = validator;
         }
 
-        public override void Evade(IField field)
+        public void Evade(IField field)
         {
             var predatorLocations = GetAllNearbyPredators(field);
             if (predatorLocations != null)
@@ -38,7 +40,7 @@ namespace Savanna.Engine.GameMechanics.Animals
             }
         }
 
-        public override void Move(IField field)
+        public void Move(IField field)
         {
             var newCoords = _stdMove.Move(field, this, StepSize);
             CoordinateX = newCoords.CoordinateX;
@@ -78,7 +80,7 @@ namespace Savanna.Engine.GameMechanics.Animals
         private Coordinates MoveAway(IField field, List<Coordinates> predatorsCoords)
         {
             var predatorAvg = GetAvgPredatorLocation(predatorsCoords);
-            Coordinates newPos = DetermineMoveAway(predatorAvg);
+            Coordinates newPos = GetMoveAwayPos(predatorAvg);
             field.Contents[CoordinateX, CoordinateY] = Settings.EmptyBlock;
             field.Contents[newPos.CoordinateX, newPos.CoordinateY] = Body;
 
@@ -100,15 +102,79 @@ namespace Savanna.Engine.GameMechanics.Animals
             return new Coordinates((int)avgXPos, (int)avgYPos);
         }
 
-        private Coordinates DetermineMoveAway(Coordinates avgPredatorPos)
+        private Coordinates GetMoveAwayPos(Coordinates avgPredatorPos)
         {
-            int newXPos = CalculateMoveAwayAxisPoint(avgPredatorPos.CoordinateX, CoordinateX);
-            int newYPos = CalculateMoveAwayAxisPoint(avgPredatorPos.CoordinateY, CoordinateY);
+            var moveOffset = CalculateMoveAwayPos(avgPredatorPos);
+            int newXPos = CoordinateX + moveOffset.CoordinateX;
+            int newYPos = CoordinateY + moveOffset.CoordinateY;
 
             newXPos = AllignIfOutOfBounds(newXPos, FieldDimensions.Width);
             newYPos = AllignIfOutOfBounds(newYPos, FieldDimensions.Height);
 
             return new Coordinates(newXPos, newYPos);
+        }
+
+        private Coordinates CalculateMoveAwayPos(Coordinates avgPredatorPos)
+        {
+            int posXDifference = CoordinateX - avgPredatorPos.CoordinateX;
+            int posYDifference = CoordinateY - avgPredatorPos.CoordinateY;
+
+            if (Math.Abs(posXDifference) < StepSize && posYDifference == 0)
+            {
+                if (posXDifference < 0)
+                {
+                    return new Coordinates(-StepSize, 0);
+                }
+                else
+                {
+                    return new Coordinates(StepSize, 0);
+                }
+            }
+            if (Math.Abs(posYDifference) < StepSize && posXDifference == 0)
+            {
+                if (posYDifference < 0)
+                {
+                    return new Coordinates(0, -StepSize);
+                }
+                else
+                {
+                    return new Coordinates(0, StepSize);
+                }
+            }
+
+            while (Math.Abs(posXDifference) > StepSize || Math.Abs(posYDifference) > StepSize)
+            {
+                if (Math.Abs(posXDifference) > StepSize)
+                {
+                    posXDifference = MoveAwayAxisPointOneUnit(posXDifference);
+                }
+                if (Math.Abs(posYDifference) > StepSize)
+                {
+                    posYDifference = MoveAwayAxisPointOneUnit(posYDifference);
+                }
+            }
+
+            while (Math.Abs(posXDifference) < StepSize && Math.Abs(posYDifference) < StepSize)
+            {
+                posXDifference += (posXDifference < 0) ? -1 : 1;
+                posYDifference += (posYDifference < 0) ? -1 : 1;
+            }
+            return new Coordinates(posXDifference, posYDifference);
+        }
+
+        private int MoveAwayAxisPointOneUnit(int axisPointDifference)
+        {
+            if (Math.Abs(axisPointDifference) > StepSize && axisPointDifference < 0)
+            {
+                return ++axisPointDifference;
+            }
+
+            if (axisPointDifference > StepSize)
+            {
+                return --axisPointDifference;
+            }
+
+            return axisPointDifference;
         }
 
         private int AllignIfOutOfBounds(int axisPoint, int maxPoint)
@@ -124,20 +190,6 @@ namespace Savanna.Engine.GameMechanics.Animals
             }
             return axisPoint;
         }
-
-        private int CalculateMoveAwayAxisPoint(int avgPredatorAxisPoint, int preyAxisPoint)
-        {
-            int newAxisPoint = preyAxisPoint;
-
-            if (avgPredatorAxisPoint > preyAxisPoint)
-            {
-                newAxisPoint -= StepSize;
-            }
-            if (avgPredatorAxisPoint < preyAxisPoint)
-            {
-                newAxisPoint += StepSize;
-            }
-            return newAxisPoint;
         }
     }
 }

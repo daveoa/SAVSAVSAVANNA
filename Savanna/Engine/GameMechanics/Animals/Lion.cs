@@ -7,12 +7,13 @@ using System.Collections.Generic;
 
 namespace Savanna.Engine.GameMechanics.Animals
 {
-    public class Lion : Carnivore
+    public class Lion : ICarnivore
     {
-        public override int FieldOfView { get => Settings.LionSight; }
-        public override int StepSize { get => Settings.LionStep; }
-        public override char Body { get => Settings.LionBody; }
-
+        public int FieldOfView { get => Settings.LionSight; }
+        public int StepSize { get => Settings.LionStep; }
+        public char Body { get => Settings.LionBody; }
+        public int CoordinateX { get; set; }
+        public int CoordinateY { get; set; }
 
         private Movement _stdMove;
         private CoordinateValidator _validator;
@@ -23,7 +24,7 @@ namespace Savanna.Engine.GameMechanics.Animals
             _validator = validator;
         }
 
-        protected override void Eat(IField field, Coordinates preyLocation)
+        public void Eat(IField field, Coordinates preyLocation)
         {
             field.Contents[preyLocation.CoordinateX, preyLocation.CoordinateY] = Body;
             field.Contents[CoordinateX, CoordinateY] = Settings.EmptyBlock;
@@ -31,7 +32,7 @@ namespace Savanna.Engine.GameMechanics.Animals
             CoordinateY = preyLocation.CoordinateY;
         }
 
-        public override void Hunt(IField field)
+        public void Hunt(IField field)
         {
             var preyCoordinates = FindClosestPreyLocation(field);
             if (preyCoordinates != null)
@@ -53,7 +54,7 @@ namespace Savanna.Engine.GameMechanics.Animals
             }
         }
 
-        public override void Move(IField field)
+        public void Move(IField field)
         {
             var newCoords = _stdMove.Move(field, this, StepSize);
             CoordinateX = newCoords.CoordinateX;
