@@ -108,10 +108,19 @@ namespace Savanna.Engine.GameMechanics.Animals
 
         private Coordinates GetMoveAwayPos(Coordinates avgPredatorPos)
         {
-
             var moveOffset = CalculateMoveAwayPos(avgPredatorPos);
             int newXPos = CoordinateX + moveOffset.CoordinateX;
             int newYPos = CoordinateY + moveOffset.CoordinateY;
+
+            newXPos += (CoordinateY == 0 && CoordinateX == avgPredatorPos.CoordinateX) ? StepSize : 0;
+            newXPos += (CoordinateY == FieldDimensions.Height && CoordinateX == avgPredatorPos.CoordinateX) ? StepSize : 0;
+            newYPos += (CoordinateY == 0 && CoordinateY == avgPredatorPos.CoordinateY) ? StepSize : 0;
+            newYPos += (CoordinateY == FieldDimensions.Height && CoordinateY == avgPredatorPos.CoordinateY) ? -StepSize : 0;
+
+            newYPos += (CoordinateX == 0 && CoordinateY == avgPredatorPos.CoordinateY) ? StepSize : 0;
+            newYPos += (CoordinateX == FieldDimensions.Width && CoordinateY == avgPredatorPos.CoordinateY) ? StepSize : 0;
+            newXPos += (CoordinateX == 0 && CoordinateX == avgPredatorPos.CoordinateX) ? StepSize : 0;
+            newXPos += (CoordinateX == FieldDimensions.Width && CoordinateX == avgPredatorPos.CoordinateX) ? -StepSize : 0;
 
             newXPos = AllignIfOutOfBounds(newXPos, FieldDimensions.Width);
             newYPos = AllignIfOutOfBounds(newYPos, FieldDimensions.Height);
