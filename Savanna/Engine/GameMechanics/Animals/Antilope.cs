@@ -81,6 +81,10 @@ namespace Savanna.Engine.GameMechanics.Animals
         {
             var predatorAvg = GetAvgPredatorLocation(predatorsCoords);
             Coordinates newPos = GetMoveAwayPos(predatorAvg);
+            if (field.Contents[newPos.CoordinateX, newPos.CoordinateY] != Settings.EmptyBlock)
+            {
+                newPos = CorrectFromStacking(field, newPos);
+            }
             field.Contents[CoordinateX, CoordinateY] = Settings.EmptyBlock;
             field.Contents[newPos.CoordinateX, newPos.CoordinateY] = Body;
 
@@ -104,6 +108,7 @@ namespace Savanna.Engine.GameMechanics.Animals
 
         private Coordinates GetMoveAwayPos(Coordinates avgPredatorPos)
         {
+
             var moveOffset = CalculateMoveAwayPos(avgPredatorPos);
             int newXPos = CoordinateX + moveOffset.CoordinateX;
             int newYPos = CoordinateY + moveOffset.CoordinateY;
@@ -190,6 +195,104 @@ namespace Savanna.Engine.GameMechanics.Animals
             }
             return axisPoint;
         }
+
+        private Coordinates CorrectFromStacking(IField field, Coordinates currentPos)
+        {
+            if (currentPos.CoordinateX > CoordinateX && currentPos.CoordinateY > CoordinateY)
+            {
+                for (int height = currentPos.CoordinateY; height >= CoordinateY; height--)
+                {
+                    for (int width = currentPos.CoordinateX; width >= CoordinateX; width--)
+                    {
+                        if (field.Contents[width, height] == Settings.EmptyBlock)
+                        {
+                            return new Coordinates(width, height);
+                        }
+                    }
+                }
+            }
+            if (currentPos.CoordinateX < CoordinateX && currentPos.CoordinateY > CoordinateY)
+            {
+                for (int height = currentPos.CoordinateY; height >= CoordinateY; height--)
+                {
+                    for (int width = currentPos.CoordinateX; width <= CoordinateX; width++)
+                    {
+                        if (field.Contents[width, height] == Settings.EmptyBlock)
+                        {
+                            return new Coordinates(width, height);
+                        }
+                    }
+                }
+            }
+            if (currentPos.CoordinateX > CoordinateX && currentPos.CoordinateY < CoordinateY)
+            {
+                for (int height = currentPos.CoordinateY; height <= CoordinateY; height++)
+                {
+                    for (int width = currentPos.CoordinateX; width >= CoordinateX; width--)
+                    {
+                        if (field.Contents[width, height] == Settings.EmptyBlock)
+                        {
+                            return new Coordinates(width, height);
+                        }
+                    }
+                }
+            }
+            if (currentPos.CoordinateX < CoordinateX && currentPos.CoordinateY < CoordinateY)
+            {
+                for (int height = currentPos.CoordinateY; height <= CoordinateY; height++)
+                {
+                    for (int width = currentPos.CoordinateX; width <= CoordinateX; width++)
+                    {
+                        if (field.Contents[width, height] == Settings.EmptyBlock)
+                        {
+                            return new Coordinates(width, height);
+                        }
+                    }
+                }
+            }
+
+            if (currentPos.CoordinateX < CoordinateX && currentPos.CoordinateY == CoordinateY)
+            {
+                for (int width = currentPos.CoordinateX; width <= CoordinateX; width++)
+                {
+                    if (field.Contents[width, CoordinateY] == Settings.EmptyBlock)
+                    {
+                        return new Coordinates(width, CoordinateY);
+                    }
+                }
+            }
+            if (currentPos.CoordinateX > CoordinateX && currentPos.CoordinateY == CoordinateY)
+            {
+                for (int width = currentPos.CoordinateX; width >= CoordinateX; width--)
+                {
+                    if (field.Contents[width, CoordinateY] == Settings.EmptyBlock)
+                    {
+                        return new Coordinates(width, CoordinateY);
+                    }
+                }
+            }
+            if (currentPos.CoordinateX == CoordinateX && currentPos.CoordinateY > CoordinateY)
+            {
+                for (int height = currentPos.CoordinateY; height >= CoordinateY; height--)
+                {
+                    if (field.Contents[CoordinateX, height] == Settings.EmptyBlock)
+                    {
+                        return new Coordinates(CoordinateX, height);
+                    }
+                }
+            }
+            if (currentPos.CoordinateX == CoordinateX && currentPos.CoordinateY < CoordinateY)
+            {
+                for (int height = currentPos.CoordinateY; height <= CoordinateY; height++)
+                {
+                    if (field.Contents[CoordinateX, height] == Settings.EmptyBlock)
+                    {
+                        return new Coordinates(CoordinateX, height);
+                    }
+                }
+            }
+            
+            return new Coordinates(CoordinateX, CoordinateY);
         }
     }
 }
