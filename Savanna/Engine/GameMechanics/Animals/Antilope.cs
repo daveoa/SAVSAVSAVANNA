@@ -18,11 +18,13 @@ namespace Savanna.Engine.GameMechanics.Animals
 
         private Movement _stdMove;
         private CoordinateValidator _validator;
+        private PlacementCorrection _correct;
 
-        public Antilope(Movement moves, CoordinateValidator validator)
+        public Antilope(Movement moves, CoordinateValidator validator, PlacementCorrection correct)
         {
             _stdMove = moves;
             _validator = validator;
+            _correct = correct;
         }
 
         public void Evade(IField field)
@@ -83,7 +85,8 @@ namespace Savanna.Engine.GameMechanics.Animals
             Coordinates newPos = GetMoveAwayPos(predatorAvg);
             if (field.Contents[newPos.CoordinateX, newPos.CoordinateY] != Settings.EmptyBlock)
             {
-                newPos = CorrectFromStacking(field, newPos);
+                newPos = 
+                    _correct.CorrectFromStacking(field, newPos.CoordinateX, newPos.CoordinateY, CoordinateX, CoordinateY);
             }
             field.Contents[CoordinateX, CoordinateY] = Settings.EmptyBlock;
             field.Contents[newPos.CoordinateX, newPos.CoordinateY] = Body;
@@ -108,24 +111,92 @@ namespace Savanna.Engine.GameMechanics.Animals
 
         private Coordinates GetMoveAwayPos(Coordinates avgPredatorPos)
         {
-            var moveOffset = CalculateMoveAwayPos(avgPredatorPos);
-            int newXPos = CoordinateX + moveOffset.CoordinateX;
-            int newYPos = CoordinateY + moveOffset.CoordinateY;
+            Coordinates newPos = null;
+            if (IsInCorner())
+            {
+                newPos = MoveOutOfCorner(avgPredatorPos);
+            }
+
+            if (IsPinnedAgainstAWall())
+            {
+                newPos = MoveAlongWall(avgPredatorPos);
+            }
+
+            if (newPos == null)
+            {
+                var moveOffset = CalculateMoveAwayPos(avgPredatorPos);
+                newPos = new Coordinates(CoordinateX + moveOffset.CoordinateX, CoordinateY + moveOffset.CoordinateY);
+            }
+
+            newPos.CoordinateX = _correct.AllignIfOutOfBounds(newPos.CoordinateX, FieldDimensions.Width);
+            newPos.CoordinateY = _correct.AllignIfOutOfBounds(newPos.CoordinateY, FieldDimensions.Height);
+            return newPos;
+        }
+
+        private bool IsPinnedAgainstAWall()
+        {
+            return CoordinateY == 0 || CoordinateX == 0 
+               || CoordinateX == FieldDimensions.Width - 1 || CoordinateY == FieldDimensions.Height - 1;
+        }
+
+        private Coordinates MoveAlongWall(Coordinates avgPredatorPos)
+        {
+            int newXPos = this.CoordinateX;
+            int newYPos = this.CoordinateY;
 
             newXPos += (CoordinateY == 0 && CoordinateX == avgPredatorPos.CoordinateX) ? StepSize : 0;
-            newXPos += (CoordinateY == FieldDimensions.Height && CoordinateX == avgPredatorPos.CoordinateX) ? StepSize : 0;
+            newXPos += (CoordinateY == FieldDimensions.Height - 1 && CoordinateX == avgPredatorPos.CoordinateX) ? StepSize : 0;
             newYPos += (CoordinateY == 0 && CoordinateY == avgPredatorPos.CoordinateY) ? StepSize : 0;
-            newYPos += (CoordinateY == FieldDimensions.Height && CoordinateY == avgPredatorPos.CoordinateY) ? -StepSize : 0;
+            newYPos += (CoordinateY == FieldDimensions.Height - 1 && CoordinateY == avgPredatorPos.CoordinateY) ? -StepSize : 0;
 
             newYPos += (CoordinateX == 0 && CoordinateY == avgPredatorPos.CoordinateY) ? StepSize : 0;
-            newYPos += (CoordinateX == FieldDimensions.Width && CoordinateY == avgPredatorPos.CoordinateY) ? StepSize : 0;
+            newYPos += (CoordinateX == FieldDimensions.Width - 1 && CoordinateY == avgPredatorPos.CoordinateY) ? StepSize : 0;
             newXPos += (CoordinateX == 0 && CoordinateX == avgPredatorPos.CoordinateX) ? StepSize : 0;
-            newXPos += (CoordinateX == FieldDimensions.Width && CoordinateX == avgPredatorPos.CoordinateX) ? -StepSize : 0;
+            newXPos += (CoordinateX == FieldDimensions.Width - 1 && CoordinateX == avgPredatorPos.CoordinateX) ? -StepSize : 0;
 
-            newXPos = AllignIfOutOfBounds(newXPos, FieldDimensions.Width);
-            newYPos = AllignIfOutOfBounds(newYPos, FieldDimensions.Height);
+            if (newXPos == this.CoordinateX && newYPos == this.CoordinateY)
+            {
+                return null;
+            }
 
             return new Coordinates(newXPos, newYPos);
+        }
+
+        private Coordinates MoveOutOfCorner(Coordinates avgPredatorPos)
+        {
+            int newXPos = this.CoordinateX;
+            int newYPos = this.CoordinateY;
+            int xDifference = this.CoordinateX - avgPredatorPos.CoordinateX;
+            int yDifference = this.CoordinateY - avgPredatorPos.CoordinateY;
+
+            if (xDifference < 0 && yDifference < 0)
+            {
+                newYPos += yDifference <= xDifference ? StepSize : 0;
+                newXPos += yDifference > xDifference ? StepSize : 0;
+            }
+            if (xDifference >= 0 && yDifference < 0)
+            {
+                newYPos += Math.Abs(yDifference) <= xDifference ? StepSize : 0;
+                newXPos += Math.Abs(yDifference) > xDifference ? -StepSize : 0;
+            }
+            if (xDifference < 0 && yDifference >= 0)
+            {
+                newYPos += yDifference <= Math.Abs(xDifference) ? -StepSize : 0;
+                newXPos += yDifference > Math.Abs(xDifference) ? StepSize : 0;
+            }
+            if (xDifference >= 0 && yDifference >= 0)
+            {
+                newYPos += yDifference >= xDifference ? -StepSize : 0;
+                newXPos += yDifference < xDifference ? -StepSize : 0;
+            }
+
+            return new Coordinates(newXPos, newYPos);
+        }
+
+        private bool IsInCorner()
+        {
+            return (this.CoordinateX == 0 || this.CoordinateX == FieldDimensions.Width - 1) 
+                && (this.CoordinateY == 0 || this.CoordinateX == FieldDimensions.Height - 1);
         }
 
         private Coordinates CalculateMoveAwayPos(Coordinates avgPredatorPos)
@@ -189,119 +260,6 @@ namespace Savanna.Engine.GameMechanics.Animals
             }
 
             return axisPointDifference;
-        }
-
-        private int AllignIfOutOfBounds(int axisPoint, int maxPoint)
-        {
-            if (axisPoint < 0)
-            {
-                return 0;
-            }
-            if (axisPoint >= maxPoint)
-            {
-                axisPoint = maxPoint - 1;
-                return axisPoint;
-            }
-            return axisPoint;
-        }
-
-        private Coordinates CorrectFromStacking(IField field, Coordinates currentPos)
-        {
-            if (currentPos.CoordinateX > CoordinateX && currentPos.CoordinateY > CoordinateY)
-            {
-                for (int height = currentPos.CoordinateY; height >= CoordinateY; height--)
-                {
-                    for (int width = currentPos.CoordinateX; width >= CoordinateX; width--)
-                    {
-                        if (field.Contents[width, height] == Settings.EmptyBlock)
-                        {
-                            return new Coordinates(width, height);
-                        }
-                    }
-                }
-            }
-            if (currentPos.CoordinateX < CoordinateX && currentPos.CoordinateY > CoordinateY)
-            {
-                for (int height = currentPos.CoordinateY; height >= CoordinateY; height--)
-                {
-                    for (int width = currentPos.CoordinateX; width <= CoordinateX; width++)
-                    {
-                        if (field.Contents[width, height] == Settings.EmptyBlock)
-                        {
-                            return new Coordinates(width, height);
-                        }
-                    }
-                }
-            }
-            if (currentPos.CoordinateX > CoordinateX && currentPos.CoordinateY < CoordinateY)
-            {
-                for (int height = currentPos.CoordinateY; height <= CoordinateY; height++)
-                {
-                    for (int width = currentPos.CoordinateX; width >= CoordinateX; width--)
-                    {
-                        if (field.Contents[width, height] == Settings.EmptyBlock)
-                        {
-                            return new Coordinates(width, height);
-                        }
-                    }
-                }
-            }
-            if (currentPos.CoordinateX < CoordinateX && currentPos.CoordinateY < CoordinateY)
-            {
-                for (int height = currentPos.CoordinateY; height <= CoordinateY; height++)
-                {
-                    for (int width = currentPos.CoordinateX; width <= CoordinateX; width++)
-                    {
-                        if (field.Contents[width, height] == Settings.EmptyBlock)
-                        {
-                            return new Coordinates(width, height);
-                        }
-                    }
-                }
-            }
-
-            if (currentPos.CoordinateX < CoordinateX && currentPos.CoordinateY == CoordinateY)
-            {
-                for (int width = currentPos.CoordinateX; width <= CoordinateX; width++)
-                {
-                    if (field.Contents[width, CoordinateY] == Settings.EmptyBlock)
-                    {
-                        return new Coordinates(width, CoordinateY);
-                    }
-                }
-            }
-            if (currentPos.CoordinateX > CoordinateX && currentPos.CoordinateY == CoordinateY)
-            {
-                for (int width = currentPos.CoordinateX; width >= CoordinateX; width--)
-                {
-                    if (field.Contents[width, CoordinateY] == Settings.EmptyBlock)
-                    {
-                        return new Coordinates(width, CoordinateY);
-                    }
-                }
-            }
-            if (currentPos.CoordinateX == CoordinateX && currentPos.CoordinateY > CoordinateY)
-            {
-                for (int height = currentPos.CoordinateY; height >= CoordinateY; height--)
-                {
-                    if (field.Contents[CoordinateX, height] == Settings.EmptyBlock)
-                    {
-                        return new Coordinates(CoordinateX, height);
-                    }
-                }
-            }
-            if (currentPos.CoordinateX == CoordinateX && currentPos.CoordinateY < CoordinateY)
-            {
-                for (int height = currentPos.CoordinateY; height <= CoordinateY; height++)
-                {
-                    if (field.Contents[CoordinateX, height] == Settings.EmptyBlock)
-                    {
-                        return new Coordinates(CoordinateX, height);
-                    }
-                }
-            }
-            
-            return new Coordinates(CoordinateX, CoordinateY);
         }
     }
 }

@@ -7,7 +7,7 @@
 
         public const char LionBody = 'L';
         public const char AntilopeBody = 'A';
-        public const char EmptyBlock = '-';
+        public const char EmptyBlock = '\u00b7';
 
         public const int LionSight = 6;
         public const int AntilopeSight = 5;

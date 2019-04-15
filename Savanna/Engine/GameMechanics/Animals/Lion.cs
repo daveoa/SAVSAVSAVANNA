@@ -17,11 +17,13 @@ namespace Savanna.Engine.GameMechanics.Animals
 
         private Movement _stdMove;
         private CoordinateValidator _validator;
+        private PredatorEssentials _special;
 
-        public Lion(Movement moves, CoordinateValidator validator)
+        public Lion(Movement moves, CoordinateValidator validator, PredatorEssentials special)
         {
             _stdMove = moves;
             _validator = validator;
+            _special = special;
         }
 
         public void Eat(IField field, Coordinates preyLocation)
@@ -34,16 +36,17 @@ namespace Savanna.Engine.GameMechanics.Animals
 
         public void Hunt(IField field)
         {
-            var preyCoordinates = FindClosestPreyLocation(field);
+            var preyCoordinates = _special.FindClosestPreyLocation(field, CoordinateX, CoordinateY, FieldOfView);
             if (preyCoordinates != null)
             {
-                if (IsPreyInMoveRange(preyCoordinates))
+                if (_special.IsPreyInMoveRange(preyCoordinates, CoordinateX, CoordinateY, StepSize))
                 {
                     Eat(field, preyCoordinates);
                 }
                 else
                 {
-                    var newPos = MoveCloser(preyCoordinates, field);
+                    var newPos = 
+                        _special.StalkPrey(preyCoordinates, field, CoordinateX, CoordinateY, StepSize, Body);
                     CoordinateX = newPos.CoordinateX;
                     CoordinateY = newPos.CoordinateY;
                 }
@@ -59,104 +62,6 @@ namespace Savanna.Engine.GameMechanics.Animals
             var newCoords = _stdMove.Move(field, this, StepSize);
             CoordinateX = newCoords.CoordinateX;
             CoordinateY = newCoords.CoordinateY;
-        }
-
-        private Coordinates FindClosestPreyLocation(IField field)
-        {
-            var preyCoords = GetAllNearbyPrey(field);
-            int closestIndex = 0;
-
-            if (preyCoords.Count == 0)
-            {
-                return null;
-            }
-            for (int currentIndex = 0; currentIndex < preyCoords.Count; currentIndex++)
-            {
-                if (System.Math.Abs(preyCoords[currentIndex].CoordinateX + preyCoords[currentIndex].CoordinateY 
-                    - CoordinateX + CoordinateY)
-                    <
-                    System.Math.Abs(preyCoords[closestIndex].CoordinateX + preyCoords[closestIndex].CoordinateY 
-                    - CoordinateX + CoordinateY))
-                {
-                    closestIndex = currentIndex;
-                }
-            }
-            return preyCoords[closestIndex];
-        }
-
-        private List<Coordinates> GetAllNearbyPrey(IField field)
-        {
-            var preyCoords = new List<Coordinates>();
-
-            for (int yAxis = CoordinateY - FieldOfView; yAxis <= CoordinateY + FieldOfView; yAxis++)
-            {
-                if (!_validator.CoordinateYIsValid(yAxis))
-                {
-                    continue;
-                }
-                for (int xAxis = CoordinateX - FieldOfView; xAxis <= CoordinateX + FieldOfView; xAxis++)
-                {
-                    if (!_validator.CoordinateXIsValid(xAxis))
-                    {
-                        continue;
-                    }
-                    if (field.Contents[xAxis, yAxis] == Settings.AntilopeBody)
-                    {
-                        preyCoords.Add(new Coordinates(xAxis, yAxis));
-                    }
-                }
-            }
-
-            return preyCoords;
-        }
-
-        private bool IsPreyInMoveRange(Coordinates preyLocation)
-        {
-            if (System.Math.Abs(preyLocation.CoordinateX - CoordinateX) > StepSize
-                || System.Math.Abs(preyLocation.CoordinateY - CoordinateY) > StepSize)
-            {
-                return false;
-            }
-            return true;
-        }
-
-        private Coordinates MoveCloser(Coordinates preyCoords, IField field)
-        {
-            int newXPos;
-            int newYPos;
-            int changeableStep = StepSize;
-
-            do
-            {
-                newXPos = CalculateMovingInPoint(preyCoords.CoordinateX, CoordinateX, changeableStep);
-                --changeableStep;
-            } while ((newXPos < 0) || (newXPos >= FieldDimensions.Width));
-
-            changeableStep = StepSize;
-            do
-            {
-                newYPos = CalculateMovingInPoint(preyCoords.CoordinateY, CoordinateY, changeableStep);
-                --changeableStep;
-            } while ((newYPos < 0) || (newYPos >= FieldDimensions.Height));
-
-            field.Contents[CoordinateX, CoordinateY] = Settings.EmptyBlock;
-            field.Contents[newXPos, newYPos] = Body;
-            return new Coordinates(newXPos, newYPos);
-        }
-
-        private int CalculateMovingInPoint(int preyAxisPoint, int hunterAxisPoint, int stepSize)
-        {
-            int newPoint = hunterAxisPoint;
-            int changeableStepSize = stepSize;
-            if (preyAxisPoint < hunterAxisPoint)
-            {
-                newPoint = hunterAxisPoint - changeableStepSize;
-            }
-            else if (preyAxisPoint > hunterAxisPoint)
-            {
-                newPoint = hunterAxisPoint + changeableStepSize;
-            }
-            return newPoint;
         }
     }
 }

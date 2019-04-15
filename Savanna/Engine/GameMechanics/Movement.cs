@@ -18,15 +18,15 @@ namespace Savanna.Engine.GameMechanics
             _validator = validator;
         }
 
-        public Coordinates Move(IField field, IFieldPresentable presentableObj, int stepsize)
+        public Coordinates Move(IField field, IFieldPresentable presentableObject, int stepsize)
         {
-            var newCoords = GenerateNextMoveCoordinates(field, presentableObj, stepsize);
-            field.Contents[presentableObj.CoordinateX, presentableObj.CoordinateY] = Settings.EmptyBlock;
-            field.Contents[newCoords.CoordinateX, newCoords.CoordinateY] = presentableObj.Body;
+            var newCoords = GenerateNextMoveCoordinates(field, presentableObject, stepsize);
+            field.Contents[presentableObject.CoordinateX, presentableObject.CoordinateY] = Settings.EmptyBlock;
+            field.Contents[newCoords.CoordinateX, newCoords.CoordinateY] = presentableObject.Body;
             return newCoords;
         }
 
-        private Coordinates GenerateNextMoveCoordinates(IField field, IFieldPresentable presentableObj, int stepSize)
+        private Coordinates GenerateNextMoveCoordinates(IField field, IFieldPresentable presentableObject, int stepSize)
         {
             int moveToX, moveToY;
             int minRand = -stepSize;
@@ -34,14 +34,13 @@ namespace Savanna.Engine.GameMechanics
 
             do
             {
-                do
-                {
-                    var offsetX = _rand.Next(minRand, maxRand);
-                    var offsetY = _rand.Next(minRand, maxRand);
-                    moveToX = presentableObj.CoordinateX + offsetX;
-                    moveToY = presentableObj.CoordinateY + offsetY;
-                } while (!_validator.CoordinatesAreValid(moveToX, moveToY));
-            } while (field.Contents[moveToX, moveToY] != Settings.EmptyBlock);
+                var offsetX = _rand.Next(minRand, maxRand);
+                var offsetY = _rand.Next(minRand, maxRand);
+                moveToX = presentableObject.CoordinateX + offsetX;
+                moveToY = presentableObject.CoordinateY + offsetY;
+            } while (!(_validator.CoordinatesAreValid(moveToX, moveToY) 
+                      && field.Contents[moveToX, moveToY] == Settings.EmptyBlock));
+
             return new Coordinates(moveToX, moveToY);
         }
     }
