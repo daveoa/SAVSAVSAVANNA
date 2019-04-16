@@ -26,6 +26,7 @@ namespace Savanna.Engine
         private CoordinateValidator _validator;
         private AxisPointCalculations _pointCalc;
         private PredatorEssentials _predSpecial;
+        private PreyEssentials _preySpecial;
         private PlacementCorrection _correct;
         private bool _isGameOver = false;
 
@@ -37,8 +38,10 @@ namespace Savanna.Engine
             _pointCalc = new AxisPointCalculations();
             _correct = new PlacementCorrection();
             _predSpecial = new PredatorEssentials(_validator, _pointCalc, _correct);
-           _standardMovement = new Movement(_rand, _validator);
-            _factory = new SavannaFactory(_validator, _spawn, _standardMovement, _pointCalc, _predSpecial, _correct);
+            _preySpecial = new PreyEssentials(_validator, _correct);
+            _standardMovement = new Movement(_rand, _validator);
+            _factory = new SavannaFactory
+                (_validator, _spawn, _standardMovement, _pointCalc, _predSpecial, _preySpecial);
             _field = new Field();
             _fieldToStrConverter = new FieldToString();
             _displayer = new ConsoleFieldDisplayer(_fieldToStrConverter);

@@ -2,7 +2,7 @@
 {
     public static class FieldDimensions
     {
-        public const int Width = 42;
-        public const int Height = 32;
+        public const int Width = 16;
+        public const int Height = 8;
     }
 }

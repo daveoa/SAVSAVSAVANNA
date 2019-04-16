@@ -5,7 +5,6 @@ using Savanna.Engine.GameMechanics.Animals;
 using Savanna.Engine.GameMechanics.Animals.AnimalTemplates;
 using Savanna.Engine.GameMechanics.Templates;
 using Savanna.Engine.GameMechanics.Validators;
-using System;
 using System.Collections.Generic;
 
 namespace Savanna.Engine.AnimalFactory
@@ -16,30 +15,30 @@ namespace Savanna.Engine.AnimalFactory
         public List<ICarnivore> Hunters { get; set; }
         private AxisPointCalculations _pointCalc;
         private PredatorEssentials _predSpecial;
+        private PreyEssentials _preySpecial;
         private ISpawner _spawn;
         private Movement _standardMovement;
-        private PlacementCorrection _correct;
         private CoordinateValidator _validator;
 
         public SavannaFactory
             (CoordinateValidator validator, ISpawner spawn, Movement movement, AxisPointCalculations pointCalc,
-            PredatorEssentials predSpecial, PlacementCorrection correct)
+            PredatorEssentials predSpecial, PreyEssentials preySpecial)
         {
             Prey = new List<IHerbivore>();
             Hunters = new List<ICarnivore>();
             _pointCalc = pointCalc;
             _predSpecial = predSpecial;
+            _preySpecial = preySpecial;
             _validator = validator;
             _spawn = spawn;
             _standardMovement = movement;
-            _correct = correct;
         }
 
         public void CreateAnimal(IField field, char animalBody)
         {
             if (animalBody == Settings.AntilopeBody)
             {
-                var creature = new Antilope(_standardMovement, _validator, _correct);
+                var creature = new Antilope(_standardMovement, _validator, _preySpecial);
                 _spawn.SetSpawnPoint(field, creature);
                 Prey.Add(creature);
             }

@@ -102,7 +102,7 @@ namespace Savanna.Engine.GameMechanics
                 }
             }
 
-            return new Coordinates(currentX, currentY);
+            return new Coordinates(originX, originY);
         }
 
         public int AllignIfOutOfBounds(int axisPoint, int maxPoint)

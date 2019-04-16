@@ -52,8 +52,8 @@
     <Compile Include="Engine\FieldDisplayer\Templates\IFieldDisplayer.cs" />
     <Compile Include="Engine\FieldDisplayer\Templates\IFieldToString.cs" />
     <Compile Include="Engine\GameEngine.cs" />
-    <Compile Include="Engine\GameMechanics\Animals\AnimalTemplates\Carnivore.cs" />
-    <Compile Include="Engine\GameMechanics\Animals\AnimalTemplates\Herbivore.cs" />
+    <Compile Include="Engine\GameMechanics\Animals\AnimalTemplates\ICarnivore.cs" />
+    <Compile Include="Engine\GameMechanics\Animals\AnimalTemplates\IHerbivore.cs" />
     <Compile Include="Engine\GameMechanics\Animals\AnimalTemplates\IAnimal.cs" />
     <Compile Include="Engine\GameMechanics\Animals\AnimalTemplates\IFieldPresentable.cs" />
     <Compile Include="Engine\GameMechanics\Animals\Antilope.cs" />
@@ -64,6 +64,7 @@
     <Compile Include="Engine\GameMechanics\Models\Coordinates.cs" />
     <Compile Include="Engine\GameMechanics\PlacementCorrection.cs" />
     <Compile Include="Engine\GameMechanics\PredatorEssentials.cs" />
+    <Compile Include="Engine\GameMechanics\PreyEssentials.cs" />
     <Compile Include="Engine\GameMechanics\Spawner.cs" />
     <Compile Include="Engine\GameMechanics\Templates\IField.cs" />
     <Compile Include="Engine\GameMechanics\Templates\ISpawner.cs" />

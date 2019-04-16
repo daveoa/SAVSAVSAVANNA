@@ -3,7 +3,6 @@ using Savanna.Engine.GameMechanics.Animals.AnimalTemplates;
 using Savanna.Engine.GameMechanics.Models;
 using Savanna.Engine.GameMechanics.Templates;
 using Savanna.Engine.GameMechanics.Validators;
-using System.Collections.Generic;
 
 namespace Savanna.Engine.GameMechanics.Animals
 {
