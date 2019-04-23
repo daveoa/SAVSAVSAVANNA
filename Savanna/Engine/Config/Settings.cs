@@ -2,7 +2,7 @@
 {
     public static class Settings
     {
-        public static string AddAnimalNotification = 
+        public static string AddAnimalNotification =
             $"{AntilopeBody} - Herbivore, {LionBody} - Carnivore";
 
         public const char LionBody = 'L';

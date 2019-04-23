@@ -34,6 +34,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -45,6 +46,8 @@
   <ItemGroup>
     <Compile Include="Engine\AnimalFactory\SavannaFactory.cs" />
     <Compile Include="Engine\AnimalFactory\Templates\ISavannaFactory.cs" />
+    <Compile Include="Engine\GameMechanics\EnemyMatchmaking.cs" />
+    <Compile Include="Engine\LoadAssembly\AssemblyLoader.cs" />
     <Compile Include="Engine\Config\FieldDimensions.cs" />
     <Compile Include="Engine\Config\Settings.cs" />
     <Compile Include="Engine\FieldDisplayer\ConsoleFieldDisplayer.cs" />
@@ -60,6 +63,7 @@
     <Compile Include="Engine\GameMechanics\Animals\Lion.cs" />
     <Compile Include="Engine\GameMechanics\AxisPointCalculations.cs" />
     <Compile Include="Engine\GameMechanics\Field.cs" />
+    <Compile Include="Engine\GameMechanics\Models\AnimalLists.cs" />
     <Compile Include="Engine\GameMechanics\Movement.cs" />
     <Compile Include="Engine\GameMechanics\Models\Coordinates.cs" />
     <Compile Include="Engine\GameMechanics\PlacementCorrection.cs" />
@@ -76,8 +80,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Engine\UserInteraction\Templates\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

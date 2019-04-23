@@ -11,15 +11,15 @@ namespace Savanna.Engine.GameMechanics
     public class PreyEssentials
     {
         private CoordinateValidator _validator;
-        private PlacementCorrection _correct;
+        private PlacementCorrection _correctPlacement;
 
-        public PreyEssentials(CoordinateValidator validator, PlacementCorrection correct)
+        public PreyEssentials(CoordinateValidator validator, PlacementCorrection correctPlacement)
         {
             _validator = validator;
-            _correct = correct;
+            _correctPlacement = correctPlacement;
         }
 
-        public List<Coordinates> GetAllNearbyPredators(IField field, IHerbivore prey)
+        public List<Coordinates> GetAllNearbyPredators(IField field, IHerbivore prey, char predatorBody)
         {
             var predatorsCoords = new List<Coordinates>();
 
@@ -35,7 +35,7 @@ namespace Savanna.Engine.GameMechanics
                     {
                         continue;
                     }
-                    if (field.Contents[xAxis, yAxis] == Settings.LionBody)
+                    if (field.Contents[xAxis, yAxis] == predatorBody)
                     {
                         predatorsCoords.Add(new Coordinates(xAxis, yAxis));
                     }
@@ -55,7 +55,7 @@ namespace Savanna.Engine.GameMechanics
             Coordinates newPos = GetMoveAwayPos(predatorAvg, prey);
             if (field.Contents[newPos.CoordinateX, newPos.CoordinateY] != Settings.EmptyBlock)
             {
-                newPos = _correct.CorrectFromStacking
+                newPos = _correctPlacement.CorrectFromStacking
                     (field, newPos.CoordinateX, newPos.CoordinateY, prey.CoordinateX, prey.CoordinateY);
             }
 
@@ -95,13 +95,13 @@ namespace Savanna.Engine.GameMechanics
 
             if (newPos == null)
             {
-                var moveOffset = CalculateMoveAwayPos(avgPredatorPos, prey);
+                var moveOffset = CalculateMoveAwayPosition(avgPredatorPos, prey);
                 newPos = new Coordinates(prey.CoordinateX + moveOffset.CoordinateX,
                                          prey.CoordinateY + moveOffset.CoordinateY);
             }
 
-            newPos.CoordinateX = _correct.AllignIfOutOfBounds(newPos.CoordinateX, FieldDimensions.Width);
-            newPos.CoordinateY = _correct.AllignIfOutOfBounds(newPos.CoordinateY, FieldDimensions.Height);
+            newPos.CoordinateX = _correctPlacement.AllignIfOutOfBounds(newPos.CoordinateX, FieldDimensions.Width);
+            newPos.CoordinateY = _correctPlacement.AllignIfOutOfBounds(newPos.CoordinateY, FieldDimensions.Height);
             return newPos;
         }
 
@@ -171,7 +171,7 @@ namespace Savanna.Engine.GameMechanics
                 && (preyY == 0 || preyX == FieldDimensions.Height - 1);
         }
 
-        private Coordinates CalculateMoveAwayPos(Coordinates avgPredatorPos, IHerbivore prey)
+        private Coordinates CalculateMoveAwayPosition(Coordinates avgPredatorPos, IHerbivore prey)
         {
             int posXDifference = prey.CoordinateX - avgPredatorPos.CoordinateX;
             int posYDifference = prey.CoordinateY - avgPredatorPos.CoordinateY;
@@ -203,11 +203,11 @@ namespace Savanna.Engine.GameMechanics
             {
                 if (Math.Abs(posXDifference) > prey.StepSize)
                 {
-                    posXDifference = MoveAwayAxisPointOneUnit(posXDifference, prey.StepSize);
+                    posXDifference = ChangeDistanceByOneUnit(posXDifference, prey.StepSize);
                 }
                 if (Math.Abs(posYDifference) > prey.StepSize)
                 {
-                    posYDifference = MoveAwayAxisPointOneUnit(posYDifference, prey.StepSize);
+                    posYDifference = ChangeDistanceByOneUnit(posYDifference, prey.StepSize);
                 }
             }
 
@@ -219,19 +219,14 @@ namespace Savanna.Engine.GameMechanics
             return new Coordinates(posXDifference, posYDifference);
         }
 
-        private int MoveAwayAxisPointOneUnit(int axisPointDifference, int stepSize)
+        private int ChangeDistanceByOneUnit(int distance, int stepSize)
         {
-            if (Math.Abs(axisPointDifference) > stepSize && axisPointDifference < 0)
+            if (Math.Abs(distance) > stepSize)
             {
-                return ++axisPointDifference;
+                distance += distance < 0 ? 1 : -1;
+                return distance;
             }
-
-            if (axisPointDifference > stepSize)
-            {
-                return --axisPointDifference;
-            }
-
-            return axisPointDifference;
+            return distance;
         }
     }
 }

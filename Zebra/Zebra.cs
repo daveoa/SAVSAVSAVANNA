@@ -1,15 +1,15 @@
-﻿using Savanna.Engine.Config;
+﻿using Savanna.Engine.GameMechanics;
 using Savanna.Engine.GameMechanics.Animals.AnimalTemplates;
 using Savanna.Engine.GameMechanics.Templates;
 using Savanna.Engine.GameMechanics.Validators;
 
-namespace Savanna.Engine.GameMechanics.Animals
+namespace Zebra
 {
-    public class Antilope : IHerbivore
+    public class Zebra : IHerbivore
     {
-        public int FieldOfView { get => Settings.AntilopeSight; }
-        public int StepSize { get => Settings.AntilopeStep; }
-        public char Body { get => Settings.AntilopeBody; }
+        public int FieldOfView { get => 4; }
+        public int StepSize { get => 3; }
+        public char Body { get => 'Z'; }
         public int CoordinateX { get; set; }
         public int CoordinateY { get; set; }
 
@@ -17,16 +17,16 @@ namespace Savanna.Engine.GameMechanics.Animals
         private PreyEssentials _special;
         private CoordinateValidator _validator;
 
-        public Antilope(Movement moves, CoordinateValidator validator, PreyEssentials special)
+        public Zebra(Movement moves, CoordinateValidator validator, PreyEssentials special)
         {
             _stdMove = moves;
             _validator = validator;
             _special = special;
         }
 
-        public void Evade(IField field, char preyBody)
+        public void Evade(IField field, char predatorBody)
         {
-            var predatorLocations = _special.GetAllNearbyPredators(field, this, preyBody);
+            var predatorLocations = _special.GetAllNearbyPredators(field, this, predatorBody);
             if (predatorLocations != null)
             {
                 var newPos = _special.MoveAway(field, predatorLocations, this);

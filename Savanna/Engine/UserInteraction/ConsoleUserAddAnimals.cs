@@ -1,33 +1,81 @@
-﻿using Savanna.Engine.AnimalFactory.Templates;
-using Savanna.Engine.Config;
+﻿using Savanna.Engine.Config;
+using Savanna.Engine.GameMechanics;
+using Savanna.Engine.GameMechanics.Animals;
+using Savanna.Engine.GameMechanics.Animals.AnimalTemplates;
+using Savanna.Engine.GameMechanics.Models;
 using Savanna.Engine.GameMechanics.Templates;
+using Savanna.Engine.GameMechanics.Validators;
 using System;
+using System.Collections.Generic;
 
 namespace Savanna.Engine.UserInteraction
 {
     public class ConsoleUserAddAnimals
     {
-        private ISavannaFactory _factory;
-        private IField _field;
+        private Movement _standardMovement;
+        private CoordinateValidator _validator;
+        private PredatorEssentials _predatorSpecial;
+        private PreyEssentials _preySpecial;
+        private ISpawner _spawner;
 
-        public ConsoleUserAddAnimals(ISavannaFactory factory, IField field)
+        public ConsoleUserAddAnimals
+            (Movement standardMovement, CoordinateValidator validator, PredatorEssentials predatorSpecial,
+            PreyEssentials preySpecial, Spawner spawner)
         {
-            _factory = factory;
-            _field = field;
+            _standardMovement = standardMovement;
+            _validator = validator;
+            _predatorSpecial = predatorSpecial;
+            _preySpecial = preySpecial;
+            _spawner = spawner;
         }
 
-        public void AddAnimals()
+        public AnimalLists AddAnimals(AnimalLists animalLists, IField field, Dictionary<char, Type> bodyAndType)
         {
-            Console.WriteLine(Settings.AddAnimalNotification);
+            Console.WriteLine(GetNotification(bodyAndType));
             char key;
             while (Console.KeyAvailable)
             {
-                if ((key = Console.ReadKey(true).KeyChar) == Char.ToLower(Settings.AntilopeBody)
-                    || (key = Console.ReadKey(true).KeyChar) == Char.ToLower(Settings.LionBody))
+                key = Console.ReadKey(true).KeyChar;
+                var newAnimalType = GetAnimalTypeFromKeyPress(key, bodyAndType);
+                if (newAnimalType != default(Type))
                 {
-                    _factory.CreateAnimal(_field, Char.ToUpper(key));
+                    if (typeof(IHerbivore).IsAssignableFrom(newAnimalType))
+                    {
+                        var animal = (IHerbivore)Activator.CreateInstance(newAnimalType, _standardMovement, _validator, _preySpecial);
+                        _spawner.SetSpawnPoint(field, animal);
+                        animalLists.Prey.Add(animal);
+                    }
+                    else if (typeof(ICarnivore).IsAssignableFrom(newAnimalType))
+                    {
+                        var animal = (ICarnivore)Activator.CreateInstance(newAnimalType, _standardMovement, _validator, _predatorSpecial);
+                        _spawner.SetSpawnPoint(field, animal);
+                        animalLists.Hunters.Add(animal);
+                    }
                 }
             }
+            return animalLists;
+        }
+
+        private string GetNotification(Dictionary<char, Type> bodyAndType)
+        {
+            string notification = "";
+            foreach (var item in bodyAndType)
+            {
+                notification += item.Key + " - " + item.Value.Name + " ";
+            }
+            return notification;
+        }
+
+        private Type GetAnimalTypeFromKeyPress(char key, Dictionary<char, Type> bodyAndType)
+        {
+            foreach (var item in bodyAndType)
+            {
+                if (key == Char.ToLower(item.Key))
+                {
+                    return item.Value;
+                }
+            }
+            return default(Type);
         }
     }
 }

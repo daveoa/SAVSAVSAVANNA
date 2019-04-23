@@ -5,10 +5,13 @@ using Savanna.Engine.FieldDisplayer;
 using Savanna.Engine.FieldDisplayer.Converters;
 using Savanna.Engine.FieldDisplayer.Templates;
 using Savanna.Engine.GameMechanics;
+using Savanna.Engine.GameMechanics.Models;
 using Savanna.Engine.GameMechanics.Templates;
 using Savanna.Engine.GameMechanics.Validators;
+using Savanna.Engine.LoadAssembly;
 using Savanna.Engine.UserInteraction;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace Savanna.Engine
@@ -17,67 +20,67 @@ namespace Savanna.Engine
     {
         private ISavannaFactory _factory;
         private IField _field;
-        private IFieldToString _fieldToStrConverter;
-        private ConsoleFieldDisplayer _displayer;
+        private IFieldDisplayer _displayer;
         private ConsoleUserAddAnimals _user;
-        private Random _rand;
-        private ISpawner _spawn;
-        private Movement _standardMovement;
-        private CoordinateValidator _validator;
-        private AxisPointCalculations _pointCalc;
-        private PredatorEssentials _predSpecial;
-        private PreyEssentials _preySpecial;
-        private PlacementCorrection _correct;
-        private bool _isGameOver = false;
+        private AnimalLists _animalLists;
+        private AssemblyLoader _assemblyLoader;
+        private EnemyMatchmaking _matchmaker;
 
         public GameEngine()
         {
-            _rand = new Random();
-            _spawn = new Spawner(_rand);
-            _validator = new CoordinateValidator();
-            _pointCalc = new AxisPointCalculations();
-            _correct = new PlacementCorrection();
-            _predSpecial = new PredatorEssentials(_validator, _pointCalc, _correct);
-            _preySpecial = new PreyEssentials(_validator, _correct);
-            _standardMovement = new Movement(_rand, _validator);
+            var rand = new Random();
+            var spawn = new Spawner(rand);
+            var validator = new CoordinateValidator();
+            var pointCalc = new AxisPointCalculations();
+            var correctPlacement = new PlacementCorrection();
+            var predatorSpecial = new PredatorEssentials(validator, pointCalc, correctPlacement);
+            var preySpecial = new PreyEssentials(validator, correctPlacement);
+            var standardMovement = new Movement(rand, validator);
+            var fieldToStrConverter = new FieldToString();
             _factory = new SavannaFactory
-                (_validator, _spawn, _standardMovement, _pointCalc, _predSpecial, _preySpecial);
+                (validator, spawn, standardMovement, predatorSpecial, preySpecial);
             _field = new Field();
-            _fieldToStrConverter = new FieldToString();
-            _displayer = new ConsoleFieldDisplayer(_fieldToStrConverter);
-            _user = new ConsoleUserAddAnimals(_factory, _field);
+            _displayer = new ConsoleFieldDisplayer(fieldToStrConverter);
+            _user = new ConsoleUserAddAnimals
+                (standardMovement, validator, predatorSpecial, preySpecial, spawn);
+            _animalLists = new AnimalLists();
+            _assemblyLoader = new AssemblyLoader(validator, standardMovement, preySpecial, predatorSpecial);
         }
 
         public void Start()
         {
+            var _isGameOver = false;
+            var animalBodyAndType = _assemblyLoader.RetrieveAnimalBodies();
+            _matchmaker = new EnemyMatchmaking(animalBodyAndType);
+
             do
             {
-                UserAddAnimals();
+                UserAddAnimals(animalBodyAndType);
                 EnableMovement();
             } while (!_isGameOver);
         }
 
         private void EnableMovement()
         {
-            foreach (var hunter in _factory.Hunters)
+            foreach (var hunter in _animalLists.Hunters)
             {
-                hunter.Hunt(_field);
+                hunter.Hunt(_field, _matchmaker.GetEnemy(hunter.Body));
             }
             _displayer.DisplayField(_field);
             Thread.Sleep(Settings.Delay);
-            _factory.Prey.RemoveAll(item => _field.Contents[item.CoordinateX, item.CoordinateY] != item.Body);
-            foreach (var hunted in _factory.Prey)
+            _animalLists.Prey.RemoveAll(item => _field.Contents[item.CoordinateX, item.CoordinateY] != item.Body);
+            foreach (var hunted in _animalLists.Prey)
             {
-                hunted.Evade(_field);
+                hunted.Evade(_field, _matchmaker.GetEnemy(hunted.Body));
             }
             _displayer.DisplayField(_field);
             Thread.Sleep(Settings.Delay);
         }
 
-        private void UserAddAnimals()
+        private void UserAddAnimals(Dictionary<char, Type> bodyAndType)
         {
-            _user.AddAnimals();
             _displayer.DisplayField(_field);
+            _animalLists = _user.AddAnimals(_animalLists, _field, bodyAndType);
         }
     }
 }

@@ -11,17 +11,18 @@ namespace Savanna.Engine.GameMechanics
     {
         private CoordinateValidator _validator;
         private AxisPointCalculations _pointCalc;
-        private PlacementCorrection _correct;
+        private PlacementCorrection _correctPlacement;
 
         public PredatorEssentials
-            (CoordinateValidator validator, AxisPointCalculations pointCalc, PlacementCorrection correct)
+            (CoordinateValidator validator, AxisPointCalculations pointCalc, PlacementCorrection correctPlacement)
         {
             _validator = validator;
             _pointCalc = pointCalc;
-            _correct = correct;
+            _correctPlacement = correctPlacement;
         }
 
-        public List<Coordinates> GetAllNearbyPrey(IField field, int predatorX, int predatorY, int predatorFOV)
+        public List<Coordinates> GetAllNearbyPrey
+            (IField field, int predatorX, int predatorY, int predatorFOV, char preyBody)
         {
             var preyCoords = new List<Coordinates>();
 
@@ -37,7 +38,7 @@ namespace Savanna.Engine.GameMechanics
                     {
                         continue;
                     }
-                    if (field.Contents[xAxis, yAxis] == Settings.AntilopeBody)
+                    if (field.Contents[xAxis, yAxis] == preyBody)
                     {
                         preyCoords.Add(new Coordinates(xAxis, yAxis));
                     }
@@ -46,9 +47,10 @@ namespace Savanna.Engine.GameMechanics
             return preyCoords;
         }
 
-        public Coordinates FindClosestPreyLocation(IField field, int predatorX, int predatorY, int predatorFOV)
+        public Coordinates FindClosestPreyLocation
+            (IField field, int predatorX, int predatorY, int predatorFOV, char preyBody)
         {
-            var preyCoords = GetAllNearbyPrey(field, predatorX, predatorY, predatorFOV);
+            var preyCoords = GetAllNearbyPrey(field, predatorX, predatorY, predatorFOV, preyBody);
             int closestIndex = 0;
 
             if (preyCoords.Count == 0)
@@ -86,7 +88,7 @@ namespace Savanna.Engine.GameMechanics
 
             if (field.Contents[newXPos, newYPos] != Settings.EmptyBlock)
             {
-                newPos = _correct.CorrectFromStacking(field, newXPos, newYPos, predatorX, predatorY);
+                newPos = _correctPlacement.CorrectFromStacking(field, newXPos, newYPos, predatorX, predatorY);
             }
 
             field.Contents[predatorX, predatorY] = Settings.EmptyBlock;

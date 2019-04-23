@@ -1,16 +1,17 @@
 ﻿using Savanna.Engine.Config;
+using Savanna.Engine.GameMechanics;
 using Savanna.Engine.GameMechanics.Animals.AnimalTemplates;
 using Savanna.Engine.GameMechanics.Models;
 using Savanna.Engine.GameMechanics.Templates;
 using Savanna.Engine.GameMechanics.Validators;
 
-namespace Savanna.Engine.GameMechanics.Animals
+namespace Lion
 {
     public class Lion : ICarnivore
     {
-        public int FieldOfView { get => Settings.LionSight; }
-        public int StepSize { get => Settings.LionStep; }
-        public char Body { get => Settings.LionBody; }
+        public int FieldOfView { get => 6; }
+        public int StepSize { get => 2; }
+        public char Body { get => 'L'; }
         public int CoordinateX { get; set; }
         public int CoordinateY { get; set; }
 

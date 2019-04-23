@@ -1,16 +1,17 @@
 ﻿using Savanna.Engine.Config;
+using Savanna.Engine.GameMechanics;
 using Savanna.Engine.GameMechanics.Animals.AnimalTemplates;
 using Savanna.Engine.GameMechanics.Models;
 using Savanna.Engine.GameMechanics.Templates;
 using Savanna.Engine.GameMechanics.Validators;
 
-namespace Savanna.Engine.GameMechanics.Animals
+namespace Jaguar
 {
-    public class Lion : ICarnivore
+    public class Jaguar : ICarnivore
     {
-        public int FieldOfView { get => Settings.LionSight; }
-        public int StepSize { get => Settings.LionStep; }
-        public char Body { get => Settings.LionBody; }
+        public int FieldOfView { get => 7; }
+        public int StepSize { get => 3; }
+        public char Body { get => 'J'; }
         public int CoordinateX { get; set; }
         public int CoordinateY { get; set; }
 
@@ -18,7 +19,7 @@ namespace Savanna.Engine.GameMechanics.Animals
         private CoordinateValidator _validator;
         private PredatorEssentials _special;
 
-        public Lion(Movement moves, CoordinateValidator validator, PredatorEssentials special)
+        public Jaguar(Movement moves, CoordinateValidator validator, PredatorEssentials special)
         {
             _stdMove = moves;
             _validator = validator;
@@ -45,7 +46,7 @@ namespace Savanna.Engine.GameMechanics.Animals
                 }
                 else
                 {
-                    var newPos = 
+                    var newPos =
                         _special.StalkPrey(preyCoordinates, field, CoordinateX, CoordinateY, StepSize, Body);
                     CoordinateX = newPos.CoordinateX;
                     CoordinateY = newPos.CoordinateY;

@@ -38,7 +38,7 @@ namespace Savanna.Engine.GameMechanics
                 var offsetY = _rand.Next(minRand, maxRand);
                 moveToX = presentableObject.CoordinateX + offsetX;
                 moveToY = presentableObject.CoordinateY + offsetY;
-            } while (!(_validator.CoordinatesAreValid(moveToX, moveToY) 
+            } while (!(_validator.CoordinatesAreValid(moveToX, moveToY)
                       && field.Contents[moveToX, moveToY] == Settings.EmptyBlock));
 
             return new Coordinates(moveToX, moveToY);

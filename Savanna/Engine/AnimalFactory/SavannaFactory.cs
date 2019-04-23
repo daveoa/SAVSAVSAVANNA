@@ -2,18 +2,14 @@
 using Savanna.Engine.Config;
 using Savanna.Engine.GameMechanics;
 using Savanna.Engine.GameMechanics.Animals;
-using Savanna.Engine.GameMechanics.Animals.AnimalTemplates;
+using Savanna.Engine.GameMechanics.Models;
 using Savanna.Engine.GameMechanics.Templates;
 using Savanna.Engine.GameMechanics.Validators;
-using System.Collections.Generic;
 
 namespace Savanna.Engine.AnimalFactory
 {
     public class SavannaFactory : ISavannaFactory
     {
-        public List<IHerbivore> Prey { get; set; }
-        public List<ICarnivore> Hunters { get; set; }
-        private AxisPointCalculations _pointCalc;
         private PredatorEssentials _predSpecial;
         private PreyEssentials _preySpecial;
         private ISpawner _spawn;
@@ -21,12 +17,9 @@ namespace Savanna.Engine.AnimalFactory
         private CoordinateValidator _validator;
 
         public SavannaFactory
-            (CoordinateValidator validator, ISpawner spawn, Movement movement, AxisPointCalculations pointCalc,
+            (CoordinateValidator validator, ISpawner spawn, Movement movement,
             PredatorEssentials predSpecial, PreyEssentials preySpecial)
         {
-            Prey = new List<IHerbivore>();
-            Hunters = new List<ICarnivore>();
-            _pointCalc = pointCalc;
             _predSpecial = predSpecial;
             _preySpecial = preySpecial;
             _validator = validator;
@@ -34,19 +27,19 @@ namespace Savanna.Engine.AnimalFactory
             _standardMovement = movement;
         }
 
-        public void CreateAnimal(IField field, char animalBody)
+        public void CreateAnimal(IField field, AnimalLists animalLists, char animalBody)
         {
             if (animalBody == Settings.AntilopeBody)
             {
                 var creature = new Antilope(_standardMovement, _validator, _preySpecial);
                 _spawn.SetSpawnPoint(field, creature);
-                Prey.Add(creature);
+                animalLists.Prey.Add(creature);
             }
-            else if (animalBody == Settings.LionBody)
+            else
             {
                 var creature = new Lion(_standardMovement, _validator, _predSpecial);
                 _spawn.SetSpawnPoint(field, creature);
-                Hunters.Add(creature);
+                animalLists.Hunters.Add(creature);
             }
         }
     }
